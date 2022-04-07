@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -87,7 +88,7 @@ public class BasicItemController {
 
         return "basic/item";
     }
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV5( Item item){
 
         itemRepository.save(item);
@@ -97,6 +98,19 @@ public class BasicItemController {
         // 따라서 리다이렉트를 해주면 다시 get으로 새로 요청이들어가서  getmapping쪽을 타게되어 새로고침시 중복저장이안됨
         //이것을 prg라고 부름 post/redirect/get
         return "redirect:/basic/items/"+ item.getId(); // 사실 이렇게 바로getid를 불러와서 넣어버리면 공백이라던지 문자가 잘못오면 오류나기때문에 관련해서 쓰는 redirectAttrbutes가 있음
+
+    }
+    @PostMapping("/add")
+    public String addItemV6(Item item, RedirectAttributes redirectAttributes){
+
+        Item saveItem = itemRepository.save(item);
+
+        //리다이렉트 시 뒤에다가 값을넣어서 날리기위해
+       redirectAttributes.addAttribute("itemId",saveItem.getId());
+       //status는 쿼리파라미터형식으로 맨뒤에 붙어서 ?status=ture 로 날아감
+        redirectAttributes.addAttribute("status",true);
+
+        return "redirect:/basic/items/{itemId}";
 
     }
 
